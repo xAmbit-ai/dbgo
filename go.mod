@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go/secretmanager v1.9.0
 	github.com/gomodule/redigo v1.8.9
 	github.com/lib/pq v1.10.7
+	golang.org/x/sync v0.1.0
 )
 
 require (

@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/gomodule/redigo/redis"
+	"golang.org/x/sync/errgroup"
 )
 
 type Db struct {
@@ -88,4 +89,36 @@ func (d *Db) Tenant(org string) (*sql.DB, error) {
 	d.tenants[org] = cxn
 
 	return d.tenants[org], nil
+}
+
+func (d *Db) Destroy() error {
+	var g errgroup.Group
+
+	g.Go(func() error {
+		if d.cache == nil {
+			return nil
+		}
+
+		return d.cache.Close()
+	})
+
+	g.Go(func() error {
+		if d.xai == nil {
+			return nil
+		}
+
+		return d.xai.Close()
+	})
+
+	for _, v := range d.tenants {
+		if v == nil {
+			continue
+		}
+
+		g.Go(func() error {
+			return v.Close()
+		})
+	}
+
+	return g.Wait()
 }
