@@ -115,9 +115,11 @@ func (d *Db) Destroy() error {
 			continue
 		}
 
-		g.Go(func() error {
-			return v.Close()
-		})
+		func(toclose *sql.DB) {
+			g.Go(func() error {
+				return v.Close()
+			})
+		}(v)
 	}
 
 	return g.Wait()
