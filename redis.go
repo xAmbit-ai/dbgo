@@ -98,5 +98,9 @@ func (d *Db) GetCache(key string) ([]byte, error) {
 		return nil, err
 	}
 
+	if b == nil {
+		return nil, nil
+	}
+
 	return b.([]byte), nil
 }
