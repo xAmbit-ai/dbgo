@@ -40,7 +40,7 @@ func (d *Db) Xai() (*sql.DB, error) {
 		db = "dev-xai"
 	}
 
-	cxn, err := d.getDbConnection(db, "roach.crt")
+	cxn, err := d.getDbConnection(db, getZoneCert())
 	if err != nil {
 		return nil, err
 	}
