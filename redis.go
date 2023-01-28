@@ -14,7 +14,7 @@ import (
 func (d *Db) connectRedis(cxn string) (*redis.Pool, error) {
 	pool := &redis.Pool{
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.DialURLContext(context.Background(), cxn)
+			c, err := redis.DialURLContext(context.Background(), cxn, redis.DialUseTLS(true))
 			if err != nil {
 				return nil, err
 			}
