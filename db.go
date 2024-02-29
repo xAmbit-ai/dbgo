@@ -10,7 +10,7 @@ import (
 )
 
 type Db struct {
-	xai     *sql.DB
+	host    *sql.DB
 	isdev   bool
 	cache   *redis.Pool
 	tenants map[string]*sql.DB
@@ -19,25 +19,21 @@ type Db struct {
 }
 
 func NewDb(project string) *Db {
-	isdev := true
-	if os.Getenv("X_ENV") == "prod" {
-		isdev = false
-	}
 	return &Db{
-		isdev:   isdev,
+		isdev:   os.Getenv("X_ENV") != "prod",
 		project: project,
 		tenants: make(map[string]*sql.DB),
 	}
 }
 
-func (d *Db) Xai() (*sql.DB, error) {
-	if d.xai != nil {
-		return d.xai, nil
+func (d *Db) Host() (*sql.DB, error) {
+	if d.host != nil {
+		return d.host, nil
 	}
 
-	db := "xai"
+	db := "host"
 	if d.isdev {
-		db = "dev-xai"
+		db = "dev-host"
 	}
 
 	cxn, err := d.getDbConnection(db, getZoneCert())
@@ -47,9 +43,9 @@ func (d *Db) Xai() (*sql.DB, error) {
 
 	d.lock.Lock()
 	defer d.lock.Unlock()
-	d.xai = cxn
+	d.host = cxn
 
-	return d.xai, nil
+	return d.host, nil
 }
 
 func (d *Db) Cache() (*redis.Pool, error) {
@@ -103,11 +99,11 @@ func (d *Db) Destroy() error {
 	})
 
 	g.Go(func() error {
-		if d.xai == nil {
+		if d.host == nil {
 			return nil
 		}
 
-		return d.xai.Close()
+		return d.host.Close()
 	})
 
 	for _, v := range d.tenants {

@@ -5,10 +5,10 @@ import (
 	"testing"
 )
 
-func TestXai(t *testing.T) {
+func TestHost(t *testing.T) {
 	db := NewDb(os.Getenv("X_PROJECT"))
 
-	if xai, err := db.Xai(); xai == nil || err != nil {
+	if xai, err := db.Host(); xai == nil || err != nil {
 		if err != nil {
 			t.Fatal("Error connecting to xAi: ", err.Error())
 		} else {
